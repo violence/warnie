@@ -1,0 +1,24 @@
+{
+  "name": "warnie",
+  "version": "0.0.1",
+  "description": "Unified linting error class for violence",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "lint",
+    "error",
+    "violence",
+    "formatter",
+    "reporter"
+  ],
+  "files": [
+    "index.js"
+  ],
+  "author": "Alexey Yaroshevich <zxqfox@gmail.com>",
+  "license": "MIT"
+}
