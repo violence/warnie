@@ -5,21 +5,19 @@ module.exports = Warnie;
  *
  * @class
  * @name Warnie
- * @param {string} message
- * @param {string} filename
- * @param {?number=0} line
- * @param {?number=0} column
- * @param {?number=0} severity (-1, 0, 1, 2)
- * @param {?string} rule
- * @param {?*} data
+ * @param {string} message - text message of error
+ * @param {string} filename - name of file the error belongs
+ * @param {number} [line=0] - errored line
+ * @param {number} [column=0] - errored column
+ * @param {number} [severity=0] - severity of the error, one of [-1, 0, 1, 2]
+ * @param {Object} [data] - variable data of the error
  */
-function Warnie(message, filename, line, column, severity, rule, data) {
-    this.message = message + "";
-    this.filename = filename + "";
+function Warnie(message, filename, line, column, severity, data) {
+    this.message = message + '';
+    this.filename = filename + '';
     this.line = line|0;
     this.column = column|0;
     this.severity = severity|0;
-    this.rule = rule + "";
     this.data = data;
 }
 
@@ -27,10 +25,13 @@ function Warnie(message, filename, line, column, severity, rule, data) {
 Warnie.shadowDye = noop;
 
 /** @type {function(s: string): string} */
+Warnie.pointerDye = noop;
+
+/** @type {function(s: string): string} */
 Warnie.messageDye = noop;
 
 /** @type {function(s: string): string} */
-Warnie.fileDye = noop;
+Warnie.filenameDye = noop;
 
 /** @type {number} */
 Warnie.linesAround = 2;
@@ -38,28 +39,34 @@ Warnie.linesAround = 2;
 /**
  * Formats error for further output.
  *
- * @param {string[]} lines - Source file lines
- * @returns {string}
+ * @param {string[]} lines - Source file content splitted by line ends
+ * @returns {string} - pretty message with pointer and lines around
  */
 Warnie.prototype.explain = function(lines) {
+    var pointer = Warnie.renderPointer(Warnie.renderLineNumber(0).length + this.column);
     var result = [
         renderLine(this.line, lines[this.line]),
-        this.shadowDye(this.renderPointer(this.column))
+        Warnie.shadowDye(pointer.slice(0, -1)) + Warnie.pointerDye(pointer.slice(-1))
     ];
 
+    // Prepend lines before the current one
     var i = this.line - 1;
-    while (i >= 0 && i >= (this.line - this.constructor.linesAround)) {
+    while (i >= 0 && i >= (this.line - Warnie.linesAround)) {
         result.unshift(renderLine(i, lines[i]));
         i--;
     }
+
+    // Append lines after the current one
     i = this.line + 1;
-    while (i < lines.length && i <= (this.line + this.constructor.linesAround)) {
+    while (i < lines.length && i <= (this.line + Warnie.linesAround)) {
         result.push(renderLine(i, lines[i]));
         i++;
     }
 
-    result.unshift(this.constructor.messageDye(this.message) + ' at '
-        + this.constructor.filenameDye(this.filename) + ' :');
+    // Prepend error info
+    var loc = this.line ? (':' + this.line + (this.column ? ':' + this.column : '')) : '';
+    result.unshift(Warnie.messageDye(this.message) + ' at '
+        + Warnie.filenameDye(this.filename) + loc + ' :');
 
     return result.join('\n');
 };
@@ -72,29 +79,29 @@ Warnie.prototype.explain = function(lines) {
  */
 Warnie.renderLineNumber = function(line) {
     // "line + 1" to print lines in human way (counted from 1)
-    return ' ' + lpad(line|0 + 1, 5) + ' |';
+    return ' ' + lpad((line|0) + 1, 5) + ' | ';
 };
 
 /**
  * Renders pointer:
  * ---------------^
  *
- * @param {number} column
+ * @param {number} column - column number for pointer
  * @returns {string}
  */
 Warnie.renderPointer = function(column) {
-    return (new Array(column + this.renderLineNumber(0).length + 1)).join('-') + '^';
+    return (new Array(column)).join('-') + '^';
 };
 
 /**
  * Simple util for prepending spaces to the string until it fits specified size.
  *
- * @param {string} s
- * @param {number} len
+ * @param {string} s - source string
+ * @param {number} len - padding length
  * @returns {string}
  */
 function lpad(s, len) {
-    s = "" + s;
+    s = '' + s;
     while (s.length < len) {
         s = ' ' + s;
     }
@@ -104,8 +111,8 @@ function lpad(s, len) {
 /**
  * Returns the first argument
  *
- * @param {string} s
- * @returns {string}
+ * @param {string} s - source string
+ * @returns {string} - source string
  */
 function noop(s) {
     return s;
@@ -114,9 +121,9 @@ function noop(s) {
 /**
  * Renders line.
  *
- * @param {number} lineNumber
- * @param {string} line
- * @returns {string}
+ * @param {number} lineNumber - line number to print
+ * @param {string} line - source text of line
+ * @returns {string} - formatted text of line to print
  */
 function renderLine(lineNumber, line) {
     return Warnie.shadowDye(Warnie.renderLineNumber(lineNumber))
