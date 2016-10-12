@@ -1,14 +1,12 @@
 {
   "name": "warnie",
   "version": "0.0.1",
+  "author": "Alexey Yaroshevich <zxqfox@gmail.com>",
   "description": "Unified linting error class for violence",
-  "main": "index.js",
-  "directories": {
-    "test": "test"
-  },
-  "scripts": {
-    "test": "mocha"
-  },
+  "main": "lib/index.js",
+  "repository": "violence/warnie",
+  "homepage": "https://github.com/violence/warnie",
+  "bugs": "https://github.com/violence/warnie/issues",
   "keywords": [
     "lint",
     "error",
@@ -16,9 +14,16 @@
     "formatter",
     "reporter"
   ],
+  "devDependencies": {
+    "eslint": "^3.7.1",
+    "eslint-config-pedant": "^0.8.0"
+  },
+  "scripts": {
+    "pretest": "eslint lib test",
+    "test": "echo ok"
+  },
   "files": [
-    "index.js"
+    "lib"
   ],
-  "author": "Alexey Yaroshevich <zxqfox@gmail.com>",
   "license": "MIT"
 }

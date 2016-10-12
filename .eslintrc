@@ -1,0 +1,6 @@
+{
+  "extends": "pedant/es5",
+  "env": {
+    "node": true
+  }
+}
