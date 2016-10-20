@@ -22,7 +22,7 @@ console.log(new Warnie('Hello world!', __filename, 3, 12)
 
 Best use with [`chalk`](https://www.npmjs.com/package/chalk) (install it with `npm i chalk`).
 
-```
+```js
 const chalk = require('chalk');
 
 // Colors customization
