@@ -64,7 +64,7 @@ Warnie.prototype.explain = function(lines) {
     }
 
     // Prepend error info
-    var loc = this.line ? (':' + this.line + (this.column ? ':' + this.column : '')) : '';
+    var loc = this.line + ':' + this.column;
     result.unshift(Warnie.messageDye(this.message) + ' at '
         + Warnie.filenameDye(this.filename) + loc + ' :');
 
