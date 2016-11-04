@@ -14,9 +14,11 @@ npm i warnie
 const Warnie = require('warnie');
 const fs = require('fs');
 
-console.log(new Warnie('Hello world!', __filename, 3, 12)
+console.log(new Warnie('Hello world!', __filename, 4, 12)
     .explain(fs.readFileSync(__filename, 'utf-8').split('\n')));
 ```
+
+**NB**. Line and column begin from 1. As for humans.
 
 ### Customization
 
@@ -50,8 +52,8 @@ Warnie.renderPointer = column => `${new Array(column).join(' ')}↑`;
 /**
  * @param {string} message - text message of error
  * @param {string} filename - name of file the error belongs
- * @param {number} [line=0] - errored line
- * @param {number} [column=0] - errored column
+ * @param {number} [line=1] - errored line
+ * @param {number} [column=1] - errored column
  * @param {number} [severity=0] - severity of the error, one of [-1, 0, 1, 2]
  * @param {Object} [data] - variable data of the error
  */

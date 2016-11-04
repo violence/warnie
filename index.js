@@ -7,16 +7,16 @@ module.exports = Warnie;
  * @name Warnie
  * @param {string} message - text message of error
  * @param {string} filename - name of file the error belongs
- * @param {number} [line=0] - errored line
- * @param {number} [column=0] - errored column
- * @param {number} [severity=0] - severity of the error, one of [-1, 0, 1, 2]
+ * @param {number} [line=1] - errored line
+ * @param {number} [column=1] - errored column
+ * @param {number} [severity=0] - severity of the error
  * @param {Object} [data] - variable data of the error
  */
 function Warnie(message, filename, line, column, severity, data) {
     this.message = message + '';
     this.filename = filename + '';
-    this.line = line|0;
-    this.column = column|0;
+    this.line = line||1;
+    this.column = column||1;
     this.severity = severity|0;
     this.data = data;
 }
@@ -43,28 +43,29 @@ Warnie.linesAround = 2;
  * @returns {string} - pretty message with pointer and lines around
  */
 Warnie.prototype.explain = function(lines) {
+    var humanLine = this.line - 1;
     var pointer = Warnie.renderPointer(Warnie.renderLineNumber(0).length + this.column);
     var result = [
-        renderLine(this.line, lines[this.line]),
+        renderLine(humanLine, lines[humanLine]),
         Warnie.shadowDye(pointer.slice(0, -1)) + Warnie.pointerDye(pointer.slice(-1))
     ];
 
     // Prepend lines before the current one
-    var i = this.line - 1;
-    while (i >= 0 && i >= (this.line - Warnie.linesAround)) {
+    var i = humanLine - 1;
+    while (i >= 0 && i >= (humanLine - Warnie.linesAround)) {
         result.unshift(renderLine(i, lines[i]));
         i--;
     }
 
     // Append lines after the current one
-    i = this.line + 1;
-    while (i < lines.length && i <= (this.line + Warnie.linesAround)) {
+    i = humanLine + 1;
+    while (i < lines.length && i <= (humanLine + Warnie.linesAround)) {
         result.push(renderLine(i, lines[i]));
         i++;
     }
 
     // Prepend error info
-    var loc = this.line ? (':' + this.line + (this.column ? ':' + this.column : '')) : '';
+    var loc = humanLine ? (':' + humanLine + (this.column ? ':' + this.column : '')) : '';
     result.unshift(Warnie.messageDye(this.message) + ' at '
         + Warnie.filenameDye(this.filename) + loc + ' :');
 
